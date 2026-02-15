@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Live Catalog POC",
+  "version": "1.0",
+
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "https://www.target.com/*",
+    "https://www.facebook.com/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.target.com/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/table/*",
+        "images/cycle/*",
+        "images/phone/*",
+        "images/blender/*",
+        "images/pan/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
