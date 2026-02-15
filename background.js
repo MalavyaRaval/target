@@ -2,41 +2,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "GET_FB_PRICE") {
 
-    chrome.tabs.create(
-      { url: message.url, active: false },
-      (tab) => {
+    chrome.windows.create({
+      url: message.url,
+      focused: false,
+      state: "minimized"
+    }, (window) => {
 
-        // Wait until Facebook page fully loads
-        chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+      const tabId = window.tabs[0].id;
 
-          if (tabId === tab.id && info.status === "complete") {
+      chrome.tabs.onUpdated.addListener(function listener(updatedTabId, info) {
 
-            chrome.tabs.onUpdated.removeListener(listener);
+        if (updatedTabId === tabId && info.status === "complete") {
 
-            chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              files: ["facebookScraper.js"]
-            });
+          chrome.tabs.onUpdated.removeListener(listener);
 
-            const priceListener = (msg, senderTab) => {
+          chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            files: ["facebookScraper.js"]
+          });
 
-              if (msg.type === "FB_PRICE" && senderTab.tab.id === tab.id) {
+          const priceListener = (msg, senderTab) => {
 
-                chrome.runtime.onMessage.removeListener(priceListener);
+            if (msg.type === "FB_PRICE" && senderTab.tab.id === tabId) {
 
-                sendResponse({ price: msg.price });
+              chrome.runtime.onMessage.removeListener(priceListener);
 
-                chrome.tabs.remove(tab.id);
-              }
-            };
+              sendResponse({ price: msg.price });
 
-            chrome.runtime.onMessage.addListener(priceListener);
-          }
+              // Close entire hidden window
+              chrome.windows.remove(window.id);
+            }
+          };
 
-        });
+          chrome.runtime.onMessage.addListener(priceListener);
+        }
 
-      }
-    );
+      });
+
+    });
 
     return true;
   }

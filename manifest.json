@@ -3,15 +3,12 @@
   "name": "Live Catalog POC",
   "version": "1.0",
 
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "tabs"
-  ],
+  "permissions": ["activeTab", "scripting", "tabs"],
 
   "host_permissions": [
     "https://www.target.com/*",
-    "https://www.facebook.com/*"
+    "https://www.facebook.com/*",
+    "https://generativelanguage.googleapis.com/*"
   ],
 
   "background": {
@@ -20,9 +17,7 @@
 
   "content_scripts": [
     {
-      "matches": [
-        "https://www.target.com/*"
-      ],
+      "matches": ["https://www.target.com/*"],
       "js": ["content.js"]
     }
   ],
